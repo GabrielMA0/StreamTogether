@@ -3,8 +3,9 @@ import io from "socket.io-client";
 import axios from 'axios';
 import Loading from '../Components/Loading/Loading'
 
-// const socket = io(import.meta.env.VITE_SOCKET_SERVER_URL);
+// const socket = io(process.env.REACT_APP_SOCKET_SERVER_URL);
 const socket = io(import.meta.env.VITE_SOCKET_SERVER_URL);
+
 
 const VideoPlayer = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -25,7 +26,7 @@ const VideoPlayer = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_SOCKET_SERVER_URL}/video/upload`, formData, {
+      const response = await axios.post(`${process.env.REACT_APP_SOCKET_SERVER_URL}/video/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
         onUploadProgress: (progressEvent) => {
           if (progressEvent.total) {
@@ -77,7 +78,7 @@ const VideoPlayer = () => {
 
   const handleChangeFile = async () => {
     try {
-      await axios.delete(`${import.meta.env.VITE_SOCKET_SERVER_URL}/video`);
+      await axios.delete(`${process.env.REACT_APP_SOCKET_SERVER_URL}/video`);
       window.location.reload();
 
     } catch (error) {
@@ -115,7 +116,7 @@ const VideoPlayer = () => {
     const searchVideo = async () => {
       if (!videoUrl) {
         try {
-          const response = await axios.get(`${import.meta.env.VITE_SOCKET_SERVER_URL}/video`);
+          const response = await axios.get(`${process.env.REACT_APP_SOCKET_SERVER_URL}/video`);
           setVideoUrl(response.data)
 
           console.log(response.data)
@@ -151,7 +152,7 @@ const VideoPlayer = () => {
       ) : (
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-5 w-full">
           <video ref={videoRef} onPlay={handlePlay} onPause={handlePause} onSeeked={handleSeek} controls muted className="w-[90%] sm:w-2/5">
-            <source src={`${import.meta.env.VITE_SOCKET_SERVER_URL}${videoUrl.fileUrl}`} type="video/mp4" />
+            <source src={`${process.env.REACT_APP_SOCKET_SERVER_URL}${videoUrl.fileUrl}`} type="video/mp4" />
             Seu navegador não suporta a tag de vídeo.
           </video>
           <button className="px-6 py-3 rounded-lg border border-blue-500 bg-blue-300 transition-transform hover:scale-110" onClick={handleChangeFile}>
