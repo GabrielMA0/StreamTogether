@@ -3,14 +3,13 @@ import io from "socket.io-client";
 import axios from 'axios';
 import Loading from '../Components/Loading/Loading'
 
-const currentUrl = window.location.hostname;
-const baseUrl = import.meta.env.VITE_SOCKET_SERVER_URL
-const socket = io(currentUrl === 'localhost' ? "http://localhost:5000" : baseUrl);
+// const socket = io(import.meta.env.VITE_SOCKET_SERVER_URL);
+const socket = io(import.meta.env.VITE_SOCKET_SERVER_URL);
 
 const VideoPlayer = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [isSeeking, setIsSeeking] = useState<boolean>(false);
+  // const [isSeeking, setIsSeeking] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [videoUrl, setVideoUrl] = useState<{ fileUrl: string } | null>(null);
   const [progress, setProgress] = useState<number>(0);
@@ -26,7 +25,7 @@ const VideoPlayer = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(`${baseUrl}/video/upload`, formData, {
+      const response = await axios.post(`${import.meta.env.VITE_SOCKET_SERVER_URL}/video/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
         onUploadProgress: (progressEvent) => {
           if (progressEvent.total) {
@@ -51,36 +50,33 @@ const VideoPlayer = () => {
   };
 
   const handlePlay = () => {
-    // if (videoRef.current?.paused) return; // Se já está pausado, não dispara
-
     socket.emit("sync-video", { action: "play" });
-    console.log("play");
+    console.log("play")
   };
 
   const handlePause = () => {
-    if (!videoRef.current?.paused) return; // Se já está rodando, não dispara
-
     socket.emit("sync-video", { action: "pause" });
-    console.log("pause");
   };
 
   const handleSeek = () => {
-    if (!videoRef.current || isSeeking) return; // Evita loop infinito
+    if (!videoRef.current) return;
 
-    setIsSeeking(true);
     socket.emit("sync-video", {
       action: "seek",
-      currentTime: videoRef.current.currentTime,
+      currentTime: videoRef.current!.currentTime,
     });
+    // setIsSeeking((prev) => {
+    //   if (!prev) {
 
-    console.log("seek");
-
-    setTimeout(() => setIsSeeking(false), 500); // Pequeno delay para evitar chamadas repetidas
+    //     setTimeout(() => setIsSeeking(false), 500);
+    //   }
+    //   return true;
+    // });
   };
 
   const handleChangeFile = async () => {
     try {
-      await axios.delete(`${baseUrl}/video`);
+      await axios.delete(`${import.meta.env.VITE_SOCKET_SERVER_URL}/video`);
       window.location.reload();
 
     } catch (error) {
@@ -90,6 +86,9 @@ const VideoPlayer = () => {
 
   useEffect(() => {
     socket.on("sync-video", ({ action, currentTime }: { action: string, currentTime: number }) => {
+
+      console.log("action", action)
+      console.log("currentTime", currentTime)
       if (videoRef.current) {
         if (action === "play") {
           videoRef.current.play();
@@ -98,9 +97,7 @@ const VideoPlayer = () => {
           videoRef.current.pause();
         }
         if (action === "seek") {
-          setIsSeeking(true); // Bloqueia chamadas repetidas
           videoRef.current.currentTime = currentTime;
-          setTimeout(() => setIsSeeking(false), 500); // Libera após um tempo
         }
       }
     });
@@ -110,11 +107,12 @@ const VideoPlayer = () => {
     };
   }, []);
 
+
   useEffect(() => {
     const searchVideo = async () => {
       if (!videoUrl) {
         try {
-          const response = await axios.get(`${baseUrl}/video`);
+          const response = await axios.get(`${import.meta.env.VITE_SOCKET_SERVER_URL}/video`);
           setVideoUrl(response.data)
         } catch (error) {
           if (error instanceof Error) {
@@ -148,7 +146,7 @@ const VideoPlayer = () => {
       ) : (
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-5 w-full">
           <video ref={videoRef} onPlay={handlePlay} onPause={handlePause} onSeeked={handleSeek} controls muted className="w-[90%] sm:w-2/5">
-            <source src={`${baseUrl}${videoUrl.fileUrl}`} type="video/mp4" />
+            <source src={`${import.meta.env.VITE_SOCKET_SERVER_URL}${videoUrl.fileUrl}`} type="video/mp4" />
             Seu navegador não suporta a tag de vídeo.
           </video>
           <button className="px-6 py-3 rounded-lg cursor-pointer border border-blue-500 bg-blue-300 transition-transform hover:scale-110" onClick={handleChangeFile}>

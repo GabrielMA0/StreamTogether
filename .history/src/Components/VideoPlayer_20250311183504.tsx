@@ -78,6 +78,7 @@ const VideoPlayer = () => {
     setTimeout(() => setIsSeeking(false), 500); // Pequeno delay para evitar chamadas repetidas
   };
 
+
   const handleChangeFile = async () => {
     try {
       await axios.delete(`${baseUrl}/video`);
@@ -90,6 +91,7 @@ const VideoPlayer = () => {
 
   useEffect(() => {
     socket.on("sync-video", ({ action, currentTime }: { action: string, currentTime: number }) => {
+
       if (videoRef.current) {
         if (action === "play") {
           videoRef.current.play();
@@ -98,9 +100,7 @@ const VideoPlayer = () => {
           videoRef.current.pause();
         }
         if (action === "seek") {
-          setIsSeeking(true); // Bloqueia chamadas repetidas
           videoRef.current.currentTime = currentTime;
-          setTimeout(() => setIsSeeking(false), 500); // Libera após um tempo
         }
       }
     });
@@ -109,6 +109,7 @@ const VideoPlayer = () => {
       socket.off("sync-video");
     };
   }, []);
+
 
   useEffect(() => {
     const searchVideo = async () => {

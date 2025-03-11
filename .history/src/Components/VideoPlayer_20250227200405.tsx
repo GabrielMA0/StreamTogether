@@ -65,9 +65,9 @@ const VideoPlayer = () => {
   };
 
   const handleSeek = () => {
-    if (!videoRef.current || isSeeking) return; // Evita loop infinito
+    // if (!videoRef.current || isSeeking) return;
 
-    setIsSeeking(true);
+    // setIsSeeking(true);
     socket.emit("sync-video", {
       action: "seek",
       currentTime: videoRef.current.currentTime,
@@ -75,7 +75,7 @@ const VideoPlayer = () => {
 
     console.log("seek");
 
-    setTimeout(() => setIsSeeking(false), 500); // Pequeno delay para evitar chamadas repetidas
+    // setTimeout(() => setIsSeeking(false), 500);
   };
 
   const handleChangeFile = async () => {
@@ -90,6 +90,7 @@ const VideoPlayer = () => {
 
   useEffect(() => {
     socket.on("sync-video", ({ action, currentTime }: { action: string, currentTime: number }) => {
+
       if (videoRef.current) {
         if (action === "play") {
           videoRef.current.play();
@@ -98,9 +99,7 @@ const VideoPlayer = () => {
           videoRef.current.pause();
         }
         if (action === "seek") {
-          setIsSeeking(true); // Bloqueia chamadas repetidas
           videoRef.current.currentTime = currentTime;
-          setTimeout(() => setIsSeeking(false), 500); // Libera após um tempo
         }
       }
     });
@@ -109,6 +108,7 @@ const VideoPlayer = () => {
       socket.off("sync-video");
     };
   }, []);
+
 
   useEffect(() => {
     const searchVideo = async () => {

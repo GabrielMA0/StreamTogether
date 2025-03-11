@@ -65,9 +65,9 @@ const VideoPlayer = () => {
   };
 
   const handleSeek = () => {
-    if (!videoRef.current || isSeeking) return; // Evita loop infinito
+    // if (!videoRef.current || isSeeking) return;
 
-    setIsSeeking(true);
+    // setIsSeeking(true);
     socket.emit("sync-video", {
       action: "seek",
       currentTime: videoRef.current.currentTime,
@@ -75,7 +75,7 @@ const VideoPlayer = () => {
 
     console.log("seek");
 
-    setTimeout(() => setIsSeeking(false), 500); // Pequeno delay para evitar chamadas repetidas
+    // setTimeout(() => setIsSeeking(false), 500);
   };
 
   const handleChangeFile = async () => {
@@ -90,6 +90,7 @@ const VideoPlayer = () => {
 
   useEffect(() => {
     socket.on("sync-video", ({ action, currentTime }: { action: string, currentTime: number }) => {
+
       if (videoRef.current) {
         if (action === "play") {
           videoRef.current.play();
@@ -98,9 +99,7 @@ const VideoPlayer = () => {
           videoRef.current.pause();
         }
         if (action === "seek") {
-          setIsSeeking(true); // Bloqueia chamadas repetidas
           videoRef.current.currentTime = currentTime;
-          setTimeout(() => setIsSeeking(false), 500); // Libera após um tempo
         }
       }
     });
@@ -109,6 +108,7 @@ const VideoPlayer = () => {
       socket.off("sync-video");
     };
   }, []);
+
 
   useEffect(() => {
     const searchVideo = async () => {
@@ -147,7 +147,7 @@ const VideoPlayer = () => {
         </div>
       ) : (
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-5 w-full">
-          <video ref={videoRef} onPlay={handlePlay} onPause={handlePause} onSeeked={handleSeek} controls muted className="w-[90%] sm:w-2/5">
+          <video ref={videoRef} onPlay={handlePlay} onPause={handlePause} controls muted className="w-[90%] sm:w-2/5">
             <source src={`${baseUrl}${videoUrl.fileUrl}`} type="video/mp4" />
             Seu navegador não suporta a tag de vídeo.
           </video>

@@ -78,6 +78,7 @@ const VideoPlayer = () => {
     setTimeout(() => setIsSeeking(false), 500); // Pequeno delay para evitar chamadas repetidas
   };
 
+
   const handleChangeFile = async () => {
     try {
       await axios.delete(`${baseUrl}/video`);
@@ -109,6 +110,7 @@ const VideoPlayer = () => {
       socket.off("sync-video");
     };
   }, []);
+
 
   useEffect(() => {
     const searchVideo = async () => {
