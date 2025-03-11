@@ -66,22 +66,17 @@ const VideoPlayer = () => {
   };
 
   const handleSeek = () => {
-    if (!videoRef.current || isSeeking) return; // Evita loops infinitos
+    if (!videoRef.current || isSeeking) return; // Evita loop infinito
 
     setIsSeeking(true);
-    setIsSyncingSeek(true); // Bloqueia play/pause durante o seek
-
     socket.emit("sync-video", {
       action: "seek",
       currentTime: videoRef.current.currentTime,
     });
 
-    console.log("seek emitido:", videoRef.current.currentTime);
+    console.log("seek");
 
-    setTimeout(() => {
-      setIsSeeking(false);
-      setIsSyncingSeek(false); // Libera o bloqueio após um tempo
-    }, 500);
+    setTimeout(() => setIsSeeking(false), 500); // Pequeno delay para evitar chamadas repetidas
   };
 
   const handleChangeFile = async () => {
@@ -125,6 +120,8 @@ const VideoPlayer = () => {
       socket.off("sync-video");
     };
   }, [isSyncingSeek]);
+
+
 
   useEffect(() => {
     const searchVideo = async () => {
