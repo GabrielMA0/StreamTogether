@@ -52,19 +52,18 @@ const VideoPlayer = () => {
   };
 
   const handlePlay = () => {
-    if (!videoRef.current || isSyncingSeek) return; // Só permite play se não estiver sincronizando seek
+    // if (videoRef.current?.paused) return; // Se já está pausado, não dispara
 
     socket.emit("sync-video", { action: "play" });
-    console.log("play emitido");
+    console.log("play");
   };
 
   const handlePause = () => {
-    if (!videoRef.current || isSyncingSeek) return; // Só permite pause se não estiver sincronizando seek
+    if (!videoRef.current?.paused) return; // Se já está rodando, não dispara
 
     socket.emit("sync-video", { action: "pause" });
-    console.log("pause emitido");
+    console.log("pause");
   };
-
 
   const handleSeek = () => {
     if (!videoRef.current || isSeeking) return; // Evita loops infinitos
